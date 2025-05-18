@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四択問題アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-purple-100 flex justify-center items-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md transition-transform hover:scale-105">
+        <h1 class="text-2xl font-semibold text-indigo-600 text-center mb-6">四択問題チャレンジ！</h1>
+        <div id="question-container" class="mb-6">
+            </div>
+        <div id="results-container" class="hidden mt-6">
+            <h2 class="text-xl font-semibold text-green-600 text-center mb-4">結果発表！</h2>
+            <p class="text-lg text-gray-700 text-center mb-4">あなたの正解数は <span id="correct-answers">0</span> 問です！</p>
+            <button id="restart-button" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-full py-3 px-6 w-full transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75">
+                もう一度挑戦する
+            </button>
+        </div>
+        <div id="message-container" class="text-red-500 text-center mt-4">
+            </div>
+    </div>
+
+    <script>
+        const questionContainer = document.getElementById('question-container');
+        const resultsContainer = document.getElementById('results-container');
+        const correctAnswersDisplay = document.getElementById('correct-answers');
+        const restartButton = document.getElementById('restart-button');
+        const messageContainer = document.getElementById('message-container');
+
+        const questions = [
+            {
+                question: "日本の首都はどこですか？",
+                options: ["大阪", "京都", "東京", "福岡"],
+                correctAnswer: "東京"
+            },
+            {
+                question: "世界で一番高い山は？",
+                options: ["富士山", "キリマンジャロ", "マッキンリー", "エベレスト"],
+                correctAnswer: "エベレスト"
+            },
+            {
+                question: "元素記号Feの元素名は？",
+                options: ["金", "銀", "鉄", "銅"],
+                correctAnswer: "鉄"
+            },
+            {
+                question: "次のうち、哺乳類でないものは？",
+                options: ["犬", "猫", "鯨", "ペンギン"],
+                correctAnswer: "ペンギン"
+            },
+            {
+                question: "日本で一番長い川は？",
+                options: ["信濃川", "利根川", "石狩川", "吉野川"],
+                correctAnswer: "信濃川"
+            },
+            {
+                question: "太陽系の惑星の数は？",
+                options: ["7", "8", "9", "10"],
+                correctAnswer: "8"
+            },
+            {
+                question: "1から6までの目があるサイコロを2回投げる時、出た目の和が偶数になる確率を求めなさい。",
+                options: ["1/2", "1/3", "2/3", "5/6"],
+                correctAnswer: "1/2"
+            },
+            {
+                question: "虹は何色？",
+                options: ["5色", "6色", "7色", "8色"],
+                correctAnswer: "7色"
+            },
+            {
+                question: "世界で一番人口が多い国は？",
+                options: ["中国", "インド", "アメリカ", "インドネシア"],
+                correctAnswer: "インド"
+            },
+            {
+                question: "次のうち、鳥類でないものは？",
+                options: ["スズメ", "ハト", "カラス", "コウモリ"],
+                correctAnswer: "コウモリ"
+            },
+            {
+                question: "日本の国鳥は？",
+                options: ["キジ", "ハト", "ツル", "スズメ"],
+                correctAnswer: "キジ"
+            },
+            {
+                question: "地球の自転周期は約何時間？",
+                options: ["12時間", "24時間", "36時間", "48時間"],
+                correctAnswer: "24時間"
+            },
+            {
+                question: "She (  ) to the store yesterday.",
+                options: ["go", "goes", "went", "going"],
+                correctAnswer: "went"
+            },
+            {
+                question: "オリンピックの五輪は何色？",
+                options: ["赤、黄、緑、青、黒", "赤、白、黄、緑、青", "赤、黄、橙、緑、青", "赤、黄、緑、紫、青"],
+                correctAnswer: "赤、黄、緑、青、黒"
+            },
+            {
+                question: "日本の消費税は何パーセント？",
+                options: ["5%", "8%", "10%", "12%"],
+                correctAnswer: "10%"
+            },
+            {
+                question: "次のうち、魚類でないものは？",
+                options: ["マグロ", "サケ", "イルカ", "サンマ"],
+                correctAnswer: "イルカ"
+            },
+            {
+                question: "世界で一番広い海は？",
+                options: ["太平洋", "大西洋", "インド洋", "北極海"],
+                correctAnswer: "太平洋"
+            },
+            {
+                question: "次のうち、昆虫でないものは？",
+                options: ["アリ", "チョウ", "クモ", "バッタ"],
+                correctAnswer: "クモ"
+            },
+            {
+                question: "日本の元号はいくつある？",
+                options: ["1", "2", "3", "4"],
+                correctAnswer: "1"
+            },
+            {
+                question: "次の文の中で「破天荒」の言葉の意味として最も適切なものを、1つ選びなさい。「彼の行動は、まさに破天荒と言えるものであった。」",
+                options: ["前例がなく、非常に珍しいこと", "非常に礼儀正しいこと", "計画的であること", "慎重であること"],
+                correctAnswer: "前例がなく、非常に珍しいこと"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let answered = false; // 回答済みフラグ
+        let askedQuestions = []; // 出題済みの問題のインデックスを保持する配列
+
+        function displayQuestion() {
+            messageContainer.textContent = ''; // メッセージをクリア
+            let randomIndex;
+            // まだ出題されていない問題を選ぶまで繰り返す
+            while (true) {
+                randomIndex = Math.floor(Math.random() * questions.length);
+                if (!askedQuestions.includes(randomIndex)) {
+                    break;
+                }
+                // すべての問題が出題済みの場合、ループを抜ける
+                if (askedQuestions.length >= questions.length) {
+                    break;
+                }
+            }
+
+            // 選ばれた問題のインデックスを記録
+            askedQuestions.push(randomIndex);
+            currentQuestionIndex = randomIndex; // グローバル変数も更新
+
+            const currentQuestion = questions[randomIndex];
+
+            const questionElement = document.createElement('h2');
+            questionElement.className = 'text-xl font-semibold text-gray-800 mb-4';
+            questionElement.textContent = currentQuestion.question;
+
+            const optionsElement = document.createElement('div');
+            optionsElement.className = 'space-y-3';
+
+            currentQuestion.options.forEach((option, index) => {
+                const optionButton = document.createElement('button');
+                optionButton.className = `
+                    bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-full py-3 px-6 w-full text-left
+                    transition duration-300 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-2
+                    focus:ring-indigo-400 focus:ring-opacity-75 flex items-center
+                `;
+                optionButton.textContent = option;
+                optionButton.dataset.option = option; // データ属性にオプションの値を設定
+                optionButton.addEventListener('click', handleOptionSelect);
+                optionsElement.appendChild(optionButton);
+            });
+
+            questionContainer.innerHTML = ''; // コンテナをクリア
+            questionContainer.appendChild(questionElement);
+            questionContainer.appendChild(optionsElement);
+            answered = false; // 回答済みフラグをリセット
+        }
+
+        function handleOptionSelect(event) {
+            if (answered) {
+                return; // すでに回答済みの場合は何もしない
+            }
+
+            answered = true; // 回答済みフラグをセット
+            const selectedOption = event.target.dataset.option;
+            const currentQuestion = questions[currentQuestionIndex];
+
+            if (selectedOption === currentQuestion.correctAnswer) {
+                correctAnswers++;
+                messageContainer.textContent = '正解！';
+                messageContainer.className = 'text-green-600 text-center mt-4 font-semibold';
+            } else {
+                messageContainer.textContent = '不正解...';
+                messageContainer.className = 'text-red-600 text-center mt-4 font-semibold';
+            }
+
+            // ボタンの色を変更
+            Array.from(event.target.parentElement.children).forEach(button => {
+                if (button.dataset.option === currentQuestion.correctAnswer) {
+                    button.className = `
+                        bg-green-500 text-white font-semibold rounded-full py-3 px-6 w-full text-left
+                        transition duration-300 ease-in-out shadow-md focus:outline-none focus:ring-2
+                        focus:ring-green-400 focus:ring-opacity-75 flex items-center
+                    `;
+                } else if (button.dataset.option === selectedOption) {
+                    button.className = `
+                        bg-red-500 text-white font-semibold rounded-full py-3 px-6 w-full text-left
+                        transition duration-300 ease-in-out shadow-md focus:outline-none focus:ring-2
+                        focus:ring-red-400 focus:ring-opacity-75 flex items-center
+                    `;
+                } else {
+                    button.className = `
+                        bg-gray-300 text-gray-500 font-semibold rounded-full py-3 px-6 w-full text-left
+                        transition duration-300 ease-in-out shadow-md focus:outline-none focus:ring-2
+                        focus:ring-gray-400 focus:ring-opacity-75 flex items-center
+                    `;
+                }
+            });
+
+            setTimeout(() => {
+                if (askedQuestions.length < questions.length) {
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1000); // 1秒後に次の問題へ
+        }
+
+        function showResults() {
+            questionContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            correctAnswersDisplay.textContent = correctAnswers;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            askedQuestions = []; // 出題済みの問題リストをリセット
+            resultsContainer.classList.add('hidden');
+            questionContainer.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        restartButton.addEventListener('click', restartQuiz);
+
+        displayQuestion(); // 最初の問題を表示
+    </script>
+</body>
+</html>
